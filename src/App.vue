@@ -1,44 +1,46 @@
 <template>
-  <div id="app">
-    <div class="info-wrapper">
-      <div class="input-wrapper">
-        <p>Зарплата Нетто:</p>
-        <input v-model="inputNettoSalary" type="text">
+  <div class="page">
+    <div id="app">
+      <div class="info-wrapper">
+        <div class="input-wrapper">
+          <p>Зарплата Нетто:</p>
+          <input v-model="inputNettoSalary" type="text">
+        </div>
+        <div class="input-wrapper">
+          <p>Подоходный налог (%):</p>
+          <input v-model="incomeTaxPercent" type="text">
+        </div>
+        <div class="input-wrapper">
+          <p>ФСЗН с работника (%):</p>
+          <input v-model="personalPensionPercent" type="text">
+        </div>
+        <div class="input-wrapper">
+          <p>ФСЗН с работадателя (%):</p>
+        <input v-model="pensionPercent" type="text"></div>
+        <div class="input-wrapper">
+          <p>Белгосстрах (%):</p>
+          <input v-model="belGosStrachPercent" type="text">
+        </div>
       </div>
-      <div class="input-wrapper">
-        <p>Подоходный налог (%):</p>
-        <input v-model="incomeTaxPercent" type="text">
+      <div class="htp-wrapper">
+        <div class="htp-input-wrapper">
+          <p>ПВТ?</p>
+          <input v-model="isHTP" type="checkbox">
+        </div>
+        <div v-if="isHTP" class="htp-salary-wrapper">
+          <p>Средняя зарплата по стране:</p>
+          <input v-model="mediumSalary" type="number">
+        </div>
       </div>
-      <div class="input-wrapper">
-        <p>ФСЗН с работника (%):</p>
-        <input v-model="personalPensionPercent" type="text">
+      <button @click="countBrutto()" class="count-button">Рассчет</button>
+      <div class="summary-wrapper">
+        <p>Начисленная зарплата: {{ bruttoSalary }}</p>
+        <p>Подоходный: {{ incomeTax }}</p>
+        <p>ФСЗН работника: {{ personalPension }}</p>
+        <p>ФСЗН работадателя: {{ pension }}</p>
+        <p>Белгосстрах: {{ belGosStrach }}</p>
+        <p>Себестоимость: {{ costSalary }}</p>
       </div>
-      <div class="input-wrapper">
-        <p>ФСЗН с работадателя (%):</p>
-      <input v-model="pensionPercent" type="text"></div>
-      <div class="input-wrapper">
-        <p>Белгосстрах (%):</p>
-        <input v-model="belGosStrachPercent" type="text">
-      </div>
-    </div>
-    <div class="htp-wrapper">
-      <div class="htp-input-wrapper">
-        <p>ПВТ?</p>
-        <input v-model="isHTP" type="checkbox">
-      </div>
-      <div v-if="isHTP" class="htp-salary-wrapper">
-        <p>Средняя зарплата по стране:</p>
-        <input v-model="mediumSalary" type="number">
-      </div>
-    </div>
-    <button @click="countBrutto()" class="count-button">Рассчет</button>
-    <div class="summary-wrapper">
-      <p>Начисленная зарплата: {{ bruttoSalary }}</p>
-      <p>Подоходный: {{ incomeTax }}</p>
-      <p>ФСЗН работника: {{ personalPension }}</p>
-      <p>ФСЗН работадателя: {{ pension }}</p>
-      <p>Белгосстрах: {{ belGosStrach }}</p>
-      <p>Себестоимость: {{ costSalary }}</p>
     </div>
   </div>
 </template>
@@ -85,7 +87,7 @@ export default {
 
       this.costSalary = (this.pension
         + this.belGosStrach
-        + brutto + this.personalPension + this.incomeTax).toFixed(2);
+        + brutto).toFixed(2);
 
       this.bruttoSalary = brutto;
       return '';
@@ -95,14 +97,28 @@ export default {
 </script>
 
 <style lang="scss">
+.page {
+  min-height: 900px;
+  padding-top: 50px;
+  margin: -8px -8px -8px -8px;
+  background-image: url("https://i.ibb.co/jHVQmxd/Closeup-Banknotes-Money-Dollars-10-Bokeh-569910-3008x2000-1.jpg");
+  background-size: 100%;
+}
 #app {
+  margin: auto;
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
-  margin-top: 60px;
+  padding-left: 20px;
+  padding-bottom: 10px;
   max-width: 950px;
+  border-radius: 10px;
+  background: rgb(184,184,184);
+  background: linear-gradient(
+    90deg, rgba(215,215,209,1) 0%, rgba(238,238,240,1) 53%, rgba(214,221,232,1) 100%
+  );
 }
 .info-wrapper {
   display: flex;
@@ -155,9 +171,33 @@ export default {
 }
 
 .count-button {
-  width: 85px;
-  height: 32px;
-  margin-top: 20px;
+    display: inline-flex;
+    margin: 10px;
+    text-decoration: none;
+    position: relative;
+    font-size: 20px;
+    line-height: 20px;
+    padding: 12px 30px;
+    color: #FFF;
+    font-weight: bold;
+    text-transform: uppercase;
+    font-family: 'Roboto Condensed', Тahoma, sans-serif;
+    background: #337AB7;
+    cursor: pointer;
+    border: 2px solid #BFE2FF;
+    outline: 1px solid;
+    outline-color: #337AB7;
+    outline-offset: 0px;
+    text-shadow: none;
+    transition: all 1.5s cubic-bezier(0.19, 1, 0.22, 1);
+}
+.count-button:hover,
+.count-button:active,
+.count-button:focus {
+    box-shadow: inset 0 0 20px #BFE2FF;
+    outline-color: rgba(255, 255, 255, 0);
+    outline-offset: 15px;
+    color: #FFF;
 }
 
 .summary-wrapper {
