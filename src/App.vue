@@ -47,7 +47,7 @@
 
 <script>
 export default {
-  name: "App",
+  name: 'App',
   data() {
     return {
       inputNettoSalary: null,
@@ -63,7 +63,7 @@ export default {
       belGosStrach: null,
       basePercent: 0.17,
       costSalary: null,
-      isHTP: false,
+      isHTP: false
     };
   },
   methods: {
@@ -71,27 +71,19 @@ export default {
       const brutto = Number(
         (
           Number(this.inputNettoSalary) /
-          (1 -
-            Number(this.incomeTaxPercent) / 100 -
-            Number(this.personalPensionPercent) / 100)
+          (1 - Number(this.incomeTaxPercent) / 100 - Number(this.personalPensionPercent) / 100)
         ).toFixed(2)
       );
 
       this.personalPension = Number(
         (brutto * (Number(this.personalPensionPercent) / 100)).toFixed(2)
       );
-      this.incomeTax = Number(
-        (brutto * (Number(this.incomeTaxPercent) / 100)).toFixed(2)
-      );
+      this.incomeTax = Number((brutto * (Number(this.incomeTaxPercent) / 100)).toFixed(2));
 
       const salaryForCount =
-        this.isHTP && brutto > Number(this.mediumSalary)
-          ? Number(this.mediumSalary)
-          : brutto;
+        this.isHTP && brutto > Number(this.mediumSalary) ? Number(this.mediumSalary) : brutto;
 
-      this.pension = Number(
-        (salaryForCount * (Number(this.pensionPercent) / 100)).toFixed(2)
-      );
+      this.pension = Number((salaryForCount * (Number(this.pensionPercent) / 100)).toFixed(2));
       this.belGosStrach = Number(
         (salaryForCount * (Number(this.belGosStrachPercent) / 100)).toFixed(2)
       );
@@ -105,9 +97,9 @@ export default {
       ).toFixed(2);
 
       this.bruttoSalary = brutto;
-      return "";
-    },
-  },
+      return '';
+    }
+  }
 };
 </script>
 
