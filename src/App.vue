@@ -3,32 +3,34 @@
     <div class="info-wrapper">
       <div class="input-wrapper">
         <p>Зарплата Нетто:</p>
-        <input v-model="inputNettoSalary" type="text">
+        <input v-model="inputNettoSalary" type="text" />
       </div>
       <div class="input-wrapper">
         <p>Подоходный налог (%):</p>
-        <input v-model="incomeTaxPercent" type="text">
+        <input v-model="incomeTaxPercent" type="text" />
       </div>
       <div class="input-wrapper">
         <p>ФСЗН с работника (%):</p>
-        <input v-model="personalPensionPercent" type="text">
+        <input v-model="personalPensionPercent" type="text" />
       </div>
       <div class="input-wrapper">
         <p>ФСЗН с работадателя (%):</p>
-      <input v-model="pensionPercent" type="text"></div>
+        <input v-model="pensionPercent" type="text" />
+      </div>
+
       <div class="input-wrapper">
         <p>Белгосстрах (%):</p>
-        <input v-model="belGosStrachPercent" type="text">
+        <input v-model="belGosStrachPercent" type="text" />
       </div>
     </div>
     <div class="htp-wrapper">
       <div class="htp-input-wrapper">
         <p>ПВТ?</p>
-        <input v-model="isHTP" type="checkbox">
+        <input v-model="isHTP" type="checkbox" />
       </div>
       <div v-if="isHTP" class="htp-salary-wrapper">
         <p>Средняя зарплата по стране:</p>
-        <input v-model="mediumSalary" type="number">
+        <input v-model="mediumSalary" type="number" />
       </div>
     </div>
     <button @click="countBrutto()" class="count-button">Рассчет</button>
@@ -44,9 +46,8 @@
 </template>
 
 <script>
-
 export default {
-  name: 'App',
+  name: "App",
   data() {
     return {
       inputNettoSalary: null,
@@ -67,28 +68,44 @@ export default {
   },
   methods: {
     countBrutto() {
-      const brutto = Number((Number(this.inputNettoSalary)
-        / (1 - (Number(this.incomeTaxPercent) / 100)
-        - (Number(this.personalPensionPercent) / 100))).toFixed(2));
+      const brutto = Number(
+        (
+          Number(this.inputNettoSalary) /
+          (1 -
+            Number(this.incomeTaxPercent) / 100 -
+            Number(this.personalPensionPercent) / 100)
+        ).toFixed(2)
+      );
 
-      this.personalPension = Number((brutto * (Number(this.personalPensionPercent) / 100))
-        .toFixed(2));
-      this.incomeTax = Number((brutto * (Number(this.incomeTaxPercent) / 100)).toFixed(2));
+      this.personalPension = Number(
+        (brutto * (Number(this.personalPensionPercent) / 100)).toFixed(2)
+      );
+      this.incomeTax = Number(
+        (brutto * (Number(this.incomeTaxPercent) / 100)).toFixed(2)
+      );
 
-      const salaryForCount = this.isHTP && (brutto > Number(this.mediumSalary))
-        ? Number(this.mediumSalary) : brutto;
+      const salaryForCount =
+        this.isHTP && brutto > Number(this.mediumSalary)
+          ? Number(this.mediumSalary)
+          : brutto;
 
-      this.pension = Number((salaryForCount * (Number(this.pensionPercent) / 100))
-        .toFixed(2));
-      this.belGosStrach = Number((salaryForCount * (Number(this.belGosStrachPercent) / 100))
-        .toFixed(2));
+      this.pension = Number(
+        (salaryForCount * (Number(this.pensionPercent) / 100)).toFixed(2)
+      );
+      this.belGosStrach = Number(
+        (salaryForCount * (Number(this.belGosStrachPercent) / 100)).toFixed(2)
+      );
 
-      this.costSalary = (this.pension
-        + this.belGosStrach
-        + brutto + this.personalPension + this.incomeTax).toFixed(2);
+      this.costSalary = (
+        this.pension +
+        this.belGosStrach +
+        brutto +
+        this.personalPension +
+        this.incomeTax
+      ).toFixed(2);
 
       this.bruttoSalary = brutto;
-      return '';
+      return "";
     },
   },
 };
