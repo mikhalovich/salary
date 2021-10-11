@@ -41,9 +41,10 @@
       <p>ФСЗН работадателя: {{ pension }}</p>
       <p>Белгосстрах: {{ belGosStrach }}</p>
       <p>Себестоимость: {{ costSalary }}</p>
-      <p :class="loading ? 'loading' : ''">
-        Курс доллара: покупка - {{ usdRate.buy }}BYN, продажа - {{ usdRate.sell }}BYN
-      </p>
+      <div :class="loading ? 'loading' : ''">
+        <p>Курс доллара: покупка - {{ usdRate.buy }}BYN, продажа - {{ usdRate.sell }}BYN</p>
+        <p>Курс доллара (Нацбанк): {{ usdRateNational }}BYN</p>
+      </div>
     </div>
   </div>
 </template>
@@ -73,6 +74,7 @@ export default {
         sell: null,
         buy: null,
       },
+      usdRateNational: null,
       loading: true,
     };
   },
@@ -85,9 +87,14 @@ export default {
     );
     this.usdRate.buy = usdRate.buyRate;
     this.usdRate.sell = usdRate.sellRate;
+    this.usdRateNational = await this.getNationalRate();
     this.loading = false;
   },
   methods: {
+    async getNationalRate(){
+      const apiResponse = await axios.get('https://developerhub.alfabank.by:8273/partner/1.0.1/public/nationalRates?currencyCode=840');
+      return apiResponse.data.rates[0].rate
+    },
     countBrutto() {
       const brutto = Number(
         (
