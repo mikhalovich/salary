@@ -87,7 +87,7 @@ export default {
 
       this.costSalary = (this.pension
         + this.belGosStrach
-        + brutto + this.personalPension + this.incomeTax).toFixed(2);
+        + brutto).toFixed(2);
 
       this.bruttoSalary = brutto;
       return '';
