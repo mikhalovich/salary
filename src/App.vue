@@ -40,12 +40,17 @@
         <p>ФСЗН работадателя: {{ pension }}</p>
         <p>Белгосстрах: {{ belGosStrach }}</p>
         <p>Себестоимость: {{ costSalary }}</p>
+        <div :class="loading ? 'loading' : ''">
+          <p>Курс доллара: покупка - {{ usdRate.buy }}BYN, продажа - {{ usdRate.sell }}BYN</p>
+          <p>Курс доллара (Нацбанк): {{ usdRateNational }}BYN</p>
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script>
+import axios from 'axios';
 
 export default {
   name: 'App',
@@ -65,9 +70,31 @@ export default {
       basePercent: 0.17,
       costSalary: null,
       isHTP: false,
+      usdRate: {
+        sell: null,
+        buy: null,
+      },
+      usdRateNational: null,
+      loading: true,
     };
   },
+  async mounted() {
+    const apiResponse = await axios.get(
+      'https://developerhub.alfabank.by:8273/partner/1.0.1/public/rates',
+    );
+    const usdRate = apiResponse.data.rates.find(
+      (rate) => rate.sellIso === 'USD' && rate.buyIso === 'BYN',
+    );
+    this.usdRate.buy = usdRate.buyRate;
+    this.usdRate.sell = usdRate.sellRate;
+    this.usdRateNational = await this.getNationalRate();
+    this.loading = false;
+  },
   methods: {
+    async getNationalRate() {
+      const apiResponse = await axios.get('https://developerhub.alfabank.by:8273/partner/1.0.1/public/nationalRates?currencyCode=840');
+      return apiResponse.data.rates[0].rate;
+    },
     countBrutto() {
       const brutto = Number((Number(this.inputNettoSalary)
         / (1 - (Number(this.incomeTaxPercent) / 100)
