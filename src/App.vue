@@ -41,11 +41,14 @@
       <p>ФСЗН работадателя: {{ pension }}</p>
       <p>Белгосстрах: {{ belGosStrach }}</p>
       <p>Себестоимость: {{ costSalary }}</p>
+      <p>Курс доллара: покупка - {{ usdRate.buy }}BYN, продажа - {{ usdRate.sell }}BYN</p>
     </div>
   </div>
 </template>
 
 <script>
+import axios from 'axios';
+
 export default {
   name: 'App',
   data() {
@@ -63,8 +66,22 @@ export default {
       belGosStrach: null,
       basePercent: 0.17,
       costSalary: null,
-      isHTP: false
+      isHTP: false,
+      usdRate: {
+        sell: null,
+        buy: null,
+      },
     };
+  },
+  async mounted() {
+    const apiResponse = await axios.get(
+      'https://developerhub.alfabank.by:8273/partner/1.0.1/public/rates'
+    );
+    const usdRate = apiResponse.data.rates.find(
+      (rate) => rate.sellIso === 'USD' && rate.buyIso === 'BYN'
+    );
+    this.usdRate.buy = usdRate.buyRate;
+    this.usdRate.sell = usdRate.sellRate;
   },
   methods: {
     countBrutto() {
@@ -98,8 +115,8 @@ export default {
 
       this.bruttoSalary = brutto;
       return '';
-    }
-  }
+    },
+  },
 };
 </script>
 
