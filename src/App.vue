@@ -41,7 +41,9 @@
       <p>ФСЗН работадателя: {{ pension }}</p>
       <p>Белгосстрах: {{ belGosStrach }}</p>
       <p>Себестоимость: {{ costSalary }}</p>
-      <p>Курс доллара: покупка - {{ usdRate.buy }}BYN, продажа - {{ usdRate.sell }}BYN</p>
+      <p :class="loading ? 'loading' : ''">
+        Курс доллара: покупка - {{ usdRate.buy }}BYN, продажа - {{ usdRate.sell }}BYN
+      </p>
     </div>
   </div>
 </template>
@@ -71,6 +73,7 @@ export default {
         sell: null,
         buy: null,
       },
+      loading: true,
     };
   },
   async mounted() {
@@ -82,6 +85,7 @@ export default {
     );
     this.usdRate.buy = usdRate.buyRate;
     this.usdRate.sell = usdRate.sellRate;
+    this.loading = false;
   },
   methods: {
     countBrutto() {
@@ -121,6 +125,20 @@ export default {
 </script>
 
 <style lang="scss">
+.loading {
+  color: transparent;
+  background: linear-gradient(100deg, #eceff1 30%, #f6f7f8 50%, #eceff1 70%);
+  background-size: 400%;
+  animation: loading 1.2s ease-in-out infinite;
+}
+@keyframes loading {
+  0% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0 50%;
+  }
+}
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
