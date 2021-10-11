@@ -101,7 +101,7 @@ export default {
   min-height: 900px;
   padding-top: 50px;
   margin: -8px -8px -8px -8px;
-  background-image: url("https://i.ibb.co/jHVQmxd/Closeup-Banknotes-Money-Dollars-10-Bokeh-569910-3008x2000-1.jpg");
+  background-image: url("https://i.ibb.co/nb0xjRg/1625271062-18-kartinkin-com-p-bukhgalteriya-fon-krasivie-foni-21-1.jpg");
   background-size: 100%;
 }
 #app {
@@ -172,11 +172,11 @@ export default {
 
 .count-button {
     display: inline-flex;
-    margin: 10px;
+    margin: 5px;
     text-decoration: none;
     position: relative;
-    font-size: 20px;
-    line-height: 20px;
+    font-size: 15px;
+    line-height: 15px;
     padding: 12px 30px;
     color: #FFF;
     font-weight: bold;
@@ -208,6 +208,61 @@ export default {
 
   p {
     margin: 5px 0;
+  }
+}
+
+@media (max-width: 768px) {
+  .page {
+    widows: 100%;
+    height: 100%;
+    background: rgb(184,184,184);
+    background: linear-gradient(
+    90deg, rgba(215,215,209,1) 0%, rgba(238,238,240,1) 53%, rgba(214,221,232,1) 100%
+  );
+    padding-top: 0;
+  }
+  #app {
+    width: 100%;
+    height: 100%;
+    border-radius: 0;
+    padding: 0;
+  }
+  .info-wrapper {
+    display: flex;
+    flex-direction: column;
+    padding: 0 1rem 0 1rem;
+    text-align: start;
+  }
+  .input-wrapper {
+    width: 100%;
+    margin: 10px 0 10px 0;
+  }
+  .htp-wrapper {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .htp-input-wrapper {
+    padding-left: 20px;
+  }
+  .htp-salary-wrapper {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 30px;
+    text-align: start;
+    p {
+      padding-left: 20px;
+    }
+    input {
+      margin-right: 17px;
+    }
+  }
+  .summary-wrapper {
+    p {
+    margin: 10px 0 10px 20px;
+    }
   }
 }
 </style>
