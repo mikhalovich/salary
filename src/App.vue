@@ -3,8 +3,19 @@
     <div id="app">
       <div class="info-wrapper">
         <div class="input-wrapper">
-          <p>Зарплата Нетто:</p>
+          <div class="currency-and-text">
+            <p>Зарплата Нетто (</p>
+              <select class="currency-select" v-model="currency">
+              <option value="byn">BYN</option>
+              <option value="usdAlfa">USD (Альфа-Банк)</option>
+              <option value="usdNatB">USD (Нацбанк)</option>
+            </select>
+            <p>) :</p>
+          </div>
           <input v-model="inputNettoSalary" type="text">
+        </div>
+        <div v-if="inputNettoSalary" class="input-wrapper small-text">
+          <p>{{ nettoSalaryOptions }}</p>
         </div>
         <div class="input-wrapper">
           <p>Подоходный налог (%):</p>
@@ -34,15 +45,55 @@
       </div>
       <button @click="countBrutto()" class="count-button">Рассчет</button>
       <div class="summary-wrapper">
-        <p>Начисленная зарплата: {{ bruttoSalary }}</p>
-        <p>Подоходный: {{ incomeTax }}</p>
-        <p>ФСЗН работника: {{ personalPension }}</p>
-        <p>ФСЗН работадателя: {{ pension }}</p>
-        <p>Белгосстрах: {{ belGosStrach }}</p>
-        <p>Себестоимость: {{ costSalary }}</p>
-        <div :class="loading ? 'loading' : ''">
-          <p>Курс доллара: покупка - {{ usdRate.buy }}BYN, продажа - {{ usdRate.sell }}BYN</p>
-          <p>Курс доллара (Нацбанк): {{ usdRateNational }}BYN</p>
+        <div class="summary-wrapper-options">
+          <p>
+            Начисленная зарплата: {{ bruttoSalary }}
+            <span v-if="bruttoSalary">{{ currencyName }}</span>
+          </p>
+          <p v-if="bruttoSalary" class="small-text indents">( {{ bruttoSalaryOptions }} )</p>
+        </div>
+        <div class="summary-wrapper-options">
+          <p>
+            Подоходный: {{ incomeTax }}
+            <span v-if="incomeTax">{{ currencyName }}</span>
+          </p>
+          <p v-if="incomeTax" class="small-text indents">( {{ incomeTaxOptions }} )</p>
+        </div>
+        <div class="summary-wrapper-options">
+          <p>
+            ФСЗН работника: {{ personalPension }}
+            <span v-if="personalPension">{{ currencyName }}</span>
+          </p>
+          <p v-if="personalPension" class="small-text indents">( {{ personalPensionOptions }} )</p>
+        </div>
+        <div class="summary-wrapper-options">
+          <p>
+            ФСЗН работадателя: {{ pension }}
+            <span v-if="pension">{{ currencyName }}</span>
+          </p>
+          <p v-if="pension" class="small-text indents">( {{ pensionOptions }} )</p>
+        </div>
+        <div class="summary-wrapper-options">
+          <p>
+            Белгосстрах: {{ belGosStrach }}
+            <span v-if="belGosStrach">{{ currencyName }}</span>
+          </p>
+          <p v-if="belGosStrach" class="small-text indents">( {{ belGosStrachOptions }} )</p>
+        </div>
+        <div class="summary-wrapper-options">
+          <p>
+            Себестоимость: {{ costSalary }}
+            <span v-if="costSalary">{{ currencyName }}</span>
+          </p>
+          <p v-if="costSalary" class="small-text indents">( {{ costSalaryOptions }} )</p>
+        </div>
+        <div class="dollar-rate" :class="loading ? 'loading' : ''">
+          <span>Курс доллара (Альфа-Банк):</span>
+          <span>покупка - {{ usdRate.buy ? usdRate.buy : '(Загрузка...)' }}BYN,</span>
+          <span>продажа - {{ usdRate.sell ? usdRate.sell : '(Загрузка...)' }}BYN.</span>
+          <span>
+            Курс доллара (Нацбанк): {{ usdRateNational ? usdRateNational : '(Загрузка...)' }}BYN
+          </span>
         </div>
       </div>
     </div>
@@ -50,6 +101,7 @@
 </template>
 
 <script>
+// eslint-disable-next-line import/no-unresolved
 import axios from 'axios';
 
 export default {
@@ -76,6 +128,7 @@ export default {
       },
       usdRateNational: null,
       loading: true,
+      currency: 'byn',
     };
   },
   async mounted() {
@@ -89,6 +142,67 @@ export default {
     this.usdRate.sell = usdRate.sellRate;
     this.usdRateNational = await this.getNationalRate();
     this.loading = false;
+  },
+  computed: {
+    nettoSalaryOptions() {
+      if (this.currency === 'byn') {
+        return `${Math.round((this.inputNettoSalary / this.usdRate.buy) * 100) / 100} USD(Альфа-Банк), ${Math.round((this.inputNettoSalary / this.usdRateNational) * 100) / 100} USD(Нацбанк)`;
+      } if (this.currency === 'usdAlfa') {
+        return `${Math.round((this.inputNettoSalary * this.usdRate.buy) * 100) / 100} BYN, ${Math.round(((this.inputNettoSalary * this.usdRate.buy) / this.usdRateNational) * 100) / 100} USD(Нацбанк)`;
+      }
+      return `${Math.round((this.inputNettoSalary * this.usdRateNational) * 100) / 100} BYN, ${Math.round(((this.inputNettoSalary * this.usdRateNational) / this.usdRate.buy) * 100) / 100} USD(Альфа-Банк)`;
+    },
+    bruttoSalaryOptions() {
+      if (this.currency === 'byn') {
+        return `${Math.round((this.bruttoSalary / this.usdRate.buy) * 100) / 100} USD(Альфа-Банк), ${Math.round((this.bruttoSalary / this.usdRateNational) * 100) / 100} USD(Нацбанк)`;
+      } if (this.currency === 'usdAlfa') {
+        return `${Math.round((this.bruttoSalary * this.usdRate.buy) * 100) / 100} BYN, ${Math.round(((this.bruttoSalary * this.usdRate.buy) / this.usdRateNational) * 100) / 100} USD(Нацбанк)`;
+      }
+      return `${Math.round((this.bruttoSalary * this.usdRateNational) * 100) / 100} BYN, ${Math.round(((this.bruttoSalary * this.usdRateNational) / this.usdRate.buy) * 100) / 100} USD(Альфа-Банк)`;
+    },
+    incomeTaxOptions() {
+      if (this.currency === 'byn') {
+        return `${Math.round((this.incomeTax / this.usdRate.buy) * 100) / 100} USD(Альфа-Банк), ${Math.round((this.incomeTax / this.usdRateNational) * 100) / 100} USD(Нацбанк)`;
+      } if (this.currency === 'usdAlfa') {
+        return `${Math.round((this.incomeTax * this.usdRate.buy) * 100) / 100} BYN, ${Math.round(((this.incomeTax * this.usdRate.buy) / this.usdRateNational) * 100) / 100} USD(Нацбанк)`;
+      }
+      return `${Math.round((this.incomeTax * this.usdRateNational) * 100) / 100} BYN, ${Math.round(((this.incomeTax * this.usdRateNational) / this.usdRate.buy) * 100) / 100} USD(Альфа-Банк)`;
+    },
+    personalPensionOptions() {
+      if (this.currency === 'byn') {
+        return `${Math.round((this.personalPension / this.usdRate.buy) * 100) / 100} USD(Альфа-Банк), ${Math.round((this.personalPension / this.usdRateNational) * 100) / 100} USD(Нацбанк)`;
+      } if (this.currency === 'usdAlfa') {
+        return `${Math.round((this.personalPension * this.usdRate.buy) * 100) / 100} BYN, ${Math.round(((this.personalPension * this.usdRate.buy) / this.usdRateNational) * 100) / 100} USD(Нацбанк)`;
+      }
+      return `${Math.round((this.personalPension * this.usdRateNational) * 100) / 100} BYN, ${Math.round(((this.personalPension * this.usdRateNational) / this.usdRate.buy) * 100) / 100} USD(Альфа-Банк)`;
+    },
+    pensionOptions() {
+      if (this.currency === 'byn') {
+        return `${Math.round((this.pension / this.usdRate.buy) * 100) / 100} USD(Альфа-Банк), ${Math.round((this.pension / this.usdRateNational) * 100) / 100} USD(Нацбанк)`;
+      } if (this.currency === 'usdAlfa') {
+        return `${Math.round((this.pension * this.usdRate.buy) * 100) / 100} BYN, ${Math.round(((this.pension * this.usdRate.buy) / this.usdRateNational) * 100) / 100} USD(Нацбанк)`;
+      }
+      return `${Math.round((this.pension * this.usdRateNational) * 100) / 100} BYN, ${Math.round(((this.pension * this.usdRateNational) / this.usdRate.buy) * 100) / 100} USD(Альфа-Банк)`;
+    },
+    belGosStrachOptions() {
+      if (this.currency === 'byn') {
+        return `${Math.round((this.belGosStrach / this.usdRate.buy) * 100) / 100} USD(Альфа-Банк), ${Math.round((this.belGosStrach / this.usdRateNational) * 100) / 100} USD(Нацбанк)`;
+      } if (this.currency === 'usdAlfa') {
+        return `${Math.round((this.belGosStrach * this.usdRate.buy) * 100) / 100} BYN, ${Math.round(((this.belGosStrach * this.usdRate.buy) / this.usdRateNational) * 100) / 100} USD(Нацбанк)`;
+      }
+      return `${Math.round((this.belGosStrach * this.usdRateNational) * 100) / 100} BYN, ${Math.round(((this.belGosStrach * this.usdRateNational) / this.usdRate.buy) * 100) / 100} USD(Альфа-Банк)`;
+    },
+    costSalaryOptions() {
+      if (this.currency === 'byn') {
+        return `${Math.round((this.costSalary / this.usdRate.buy) * 100) / 100} USD(Альфа-Банк), ${Math.round((this.costSalary / this.usdRateNational) * 100) / 100} USD(Нацбанк)`;
+      } if (this.currency === 'usdAlfa') {
+        return `${Math.round((this.costSalary * this.usdRate.buy) * 100) / 100} BYN, ${Math.round(((this.costSalary * this.usdRate.buy) / this.usdRateNational) * 100) / 100} USD(Нацбанк)`;
+      }
+      return `${Math.round((this.costSalary * this.usdRateNational) * 100) / 100} BYN, ${Math.round(((this.costSalary * this.usdRateNational) / this.usdRate.buy) * 100) / 100} USD(Альфа-Банк)`;
+    },
+    currencyName() {
+      return this.currency === 'byn' ? 'BYN' : 'USD';
+    },
   },
   methods: {
     async getNationalRate() {
@@ -154,12 +268,12 @@ export default {
 }
 .input-wrapper {
   display: flex;
-  width: 31%;
+  width: 45%;
   height: 20px;
   margin-top: 15px;
   justify-content: space-between;
   align-items: center;
-  margin-right: 19%;
+  margin-right: 5%;
 
   input {
     width: 60px;
@@ -197,9 +311,34 @@ export default {
   }
 }
 
+.currency-and-text {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.currency-select {
+  height: 20px;
+  width: 100px;
+}
+
+.loading {
+  opacity: 50%;
+}
+
+.dollar-rate {
+  display: flex;
+  flex-direction: row;
+
+  span {
+    text-align: left;
+    padding: 5px 5px 5px 0;
+  }
+}
+
 .count-button {
     display: inline-flex;
-    margin: 5px;
+    margin: 5px 15px 5px 5px;
     text-decoration: none;
     position: relative;
     font-size: 15px;
@@ -236,6 +375,20 @@ export default {
   p {
     margin: 5px 0;
   }
+}
+
+.summary-wrapper-options {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.small-text {
+  font-size: 13px;
+}
+
+.indents {
+  padding-left: 20px;
 }
 
 @media (max-width: 768px) {
@@ -290,6 +443,26 @@ export default {
     p {
     margin: 10px 0 10px 20px;
     }
+  }
+  .summary-wrapper-options {
+    flex-direction: column;
+    text-align: start;
+    align-items: flex-start;
+  }
+  .dollar-rate {
+    flex-direction: column;
+
+    span {
+      text-align: left;
+      padding: 10px 10px 10px 20px;
+    }
+  }
+  .currency-select {
+    width: 70px;
+  }
+  .indents {
+    padding-left: 0;
+    padding-right: 5px;
   }
 }
 </style>
